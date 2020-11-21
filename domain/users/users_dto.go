@@ -19,9 +19,6 @@ type User struct {
 	Status   bool   `json:"status"`
 }
 
-// Users define model
-type Users []User
-
 // HashPassword hashes password from user input
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
