@@ -14,6 +14,15 @@ func (u *User) SaveUser() (*User, error) {
 	return u, nil
 }
 
+// GetUserByID returns a user based on id
+func (u *User) GetUserByID(id int64) (*User, error) {
+	account := &User{}
+	if err := db.Client.Debug().Table("users").Where("id = ?", id).First(account).Error; err != nil {
+		return nil, err
+	}
+	return account, nil
+}
+
 // GetUserByEmail returns a user based on email
 func (u *User) GetUserByEmail() (*User, error) {
 	account := &User{}

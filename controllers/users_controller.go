@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lequocduyquang/user-profile-service/domain/users"
@@ -18,6 +18,7 @@ var (
 // UserControllerInterface interface
 type UserControllerInterface interface {
 	GetAll(c *gin.Context)
+	GetByID(c *gin.Context)
 	Register(c *gin.Context)
 }
 
@@ -35,7 +36,6 @@ func (u *userController) GetAll(c *gin.Context) {
 
 func (u *userController) Register(c *gin.Context) {
 	var user users.User
-	fmt.Printf("Value of user %v", &user)
 	if err := c.ShouldBindJSON(&user); err != nil {
 		restErr := utils.NewBadRequestError("invalid json body")
 		c.JSON(restErr.Status(), restErr)
@@ -43,7 +43,27 @@ func (u *userController) Register(c *gin.Context) {
 	}
 	result, savedErr := services.UserService.Create(user)
 	if savedErr != nil {
-		c.JSON(http.StatusBadRequest, savedErr)
+		restErr := utils.NewBadRequestError(savedErr.Error())
+		c.JSON(restErr.Status(), restErr)
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
+func (u *userController) GetByID(c *gin.Context) {
+	var (
+		err    error
+		userID int64
+	)
+	if userID, err = strconv.ParseInt(c.Param("id"), 10, 64); err != nil {
+		restErr := utils.NewBadRequestError("User id is invalid")
+		c.JSON(restErr.Status(), restErr)
+		return
+	}
+	result, foundErr := services.UserService.GetByID(userID)
+	if foundErr != nil {
+		restErr := utils.NewBadRequestError(foundErr.Error())
+		c.JSON(restErr.Status(), restErr)
 		return
 	}
 	c.JSON(http.StatusOK, result)
