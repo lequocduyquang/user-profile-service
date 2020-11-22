@@ -1,6 +1,9 @@
 package app
 
 import (
+	"log"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lequocduyquang/user-profile-service/db"
 	"github.com/lequocduyquang/user-profile-service/domain/users"
@@ -12,7 +15,8 @@ var (
 
 // StartApp Bootstraping user profile service
 func StartApp() {
+	db.ConnectToDB()
 	db.Client.AutoMigrate(&users.User{})
 	mapUrls()
-	router.Run(":5000")
+	log.Fatal(router.Run(os.Getenv("PORT")))
 }
