@@ -20,6 +20,7 @@ type UserControllerInterface interface {
 	GetAll(c *gin.Context)
 	GetByID(c *gin.Context)
 	Register(c *gin.Context)
+	DeleteByID(c *gin.Context)
 }
 
 type userController struct{}
@@ -47,7 +48,7 @@ func (u *userController) Register(c *gin.Context) {
 		c.JSON(restErr.Status(), restErr)
 		return
 	}
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusCreated, result)
 }
 
 func (u *userController) GetByID(c *gin.Context) {
@@ -63,6 +64,25 @@ func (u *userController) GetByID(c *gin.Context) {
 	result, foundErr := services.UserService.GetByID(userID)
 	if foundErr != nil {
 		restErr := utils.NewBadRequestError(foundErr.Error())
+		c.JSON(restErr.Status(), restErr)
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
+func (u *userController) DeleteByID(c *gin.Context) {
+	var (
+		err    error
+		userID int64
+	)
+	if userID, err = strconv.ParseInt(c.Param("id"), 10, 64); err != nil {
+		restErr := utils.NewBadRequestError("User id is invalid")
+		c.JSON(restErr.Status(), restErr)
+		return
+	}
+	result, deletedErr := services.UserService.Delete(userID)
+	if deletedErr != nil {
+		restErr := utils.NewBadRequestError(deletedErr.Error())
 		c.JSON(restErr.Status(), restErr)
 		return
 	}

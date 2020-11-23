@@ -17,6 +17,7 @@ type UserServiceInterface interface {
 	GetAll() (*[]users.User, error)
 	GetByID(int64) (*users.User, error)
 	Create(users.User) (*users.User, error)
+	Delete(int64) (*users.User, error)
 }
 
 type userService struct{}
@@ -51,4 +52,17 @@ func (u *userService) Create(user users.User) (*users.User, error) {
 		return nil, err
 	}
 	return createdUser, nil
+}
+
+func (u *userService) Delete(id int64) (*users.User, error) {
+	foundUser, err := dao.GetUserByID(id)
+	if err != nil {
+		return nil, err
+	}
+	foundUser.Status = false
+	deletedUser, err := foundUser.DeleteByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return deletedUser, nil
 }

@@ -40,3 +40,12 @@ func (u *User) GetAllUsers() (*[]User, error) {
 	}
 	return &users, nil
 }
+
+// DeleteByID returns a user based on id
+func (u *User) DeleteByID(id int64) (*User, error) {
+	account := &User{}
+	if err := db.Client.Debug().Table("users").Where("id = ?", id).First(account).Update("status", false).Error; err != nil {
+		return nil, err
+	}
+	return u, nil
+}
