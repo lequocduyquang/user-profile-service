@@ -1,6 +1,8 @@
 package users
 
 import (
+	"fmt"
+
 	"github.com/lequocduyquang/user-profile-service/db"
 )
 
@@ -41,11 +43,25 @@ func (u *User) GetAllUsers() (*[]User, error) {
 	return &users, nil
 }
 
-// DeleteByID returns a user based on id
+// DeleteByID returns a user status false based on id
 func (u *User) DeleteByID(id int64) (*User, error) {
 	account := &User{}
 	if err := db.Client.Debug().Table("users").Where("id = ?", id).First(account).Update("status", false).Error; err != nil {
 		return nil, err
 	}
 	return u, nil
+}
+
+// UpdateByID return updated user
+func (u *User) UpdateByID(id int64, user User) (*User, error) {
+	fmt.Printf("Value of user %v", user)
+	if err := db.Client.Debug().Table("users").Where("id = ?", id).Updates(&User{
+		UserName: user.UserName,
+		Email:    user.Email,
+		Avatar:   user.Avatar,
+	}).Error; err != nil {
+		return nil, err
+	}
+	updatedUser, _ := u.GetUserByID(id)
+	return updatedUser, nil
 }

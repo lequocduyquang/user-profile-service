@@ -16,7 +16,7 @@ type User struct {
 	UserName string `gorm:"size:100;not null" json:"username"`
 	Password string `gorm:"size:100;not null" json:"password"`
 	Avatar   string `gorm:"size:255" json:"avatar"`
-	Status   bool   `json:"status"`
+	Status   int64  `json:"status"`
 }
 
 // HashPassword hashes password from user input
